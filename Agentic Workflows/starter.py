@@ -18,7 +18,7 @@ client = OpenAI(
     # If using the OpenAI API endpoint, you can comment out the base_url line
     base_url="https://openai.vocareum.com/v1",
     # Uncomment one of the following
-    api_key="voc-7365955961607363338581687755b5a1dfb4.10012173",
+    api_key="xx",
 
 )
 def get_hardcoded_answer(question):

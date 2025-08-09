@@ -22,4 +22,4 @@ direct_agent_response = direct_agent.respond(prompt)
 print(direct_agent_response)
 
 # TODO: 5 - Print an explanatory message describing the knowledge source used by the agent to generate the response
-print("The agent used its pre-trained knowledge to generate this response.")
+print("The agent used its pre-trained knowledge to generate this response. The model that was used for generating this response is gpt-3.5-turbo.")

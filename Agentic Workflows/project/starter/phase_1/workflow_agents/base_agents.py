@@ -60,18 +60,18 @@ class AugmentedPromptAgent:
         return response.choices[0].message.content
 
 
-'''
+
 # KnowledgeAugmentedPromptAgent class definition
 class KnowledgeAugmentedPromptAgent:
     def __init__(self, openai_api_key, persona, knowledge):
         """Initialize the agent with provided attributes."""
         self.persona = persona
-        # TODO: 1 - Create an attribute to store the agent's knowledge.
+        self.knowledge = knowledge
         self.openai_api_key = openai_api_key
 
     def respond(self, input_text):
         """Generate a response using the OpenAI API."""
-        client = OpenAI(api_key=self.openai_api_key)
+        client = OpenAI(api_key=self.openai_api_key, base_url = "https://openai.vocareum.com/v1")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -82,13 +82,14 @@ class KnowledgeAugmentedPromptAgent:
                 #             "Use only the following knowledge to answer, do not use your own knowledge: _knowledge_"
                 #           - Final instruction:
                 #             "Answer the prompt based on this knowledge, not your own."
-
+                {"role": "system", "content": f"You are {self.persona} knowledge-based assistant. Forget all previous context. Use only the following knowledge to answer, do not use your own knowledge: {self.knowledge}. Answer the prompt based on this knowledge, not your own."},
                 # TODO: 3 - Add the user's input prompt here as a user message.
+                {"role": "user", "content": input_text}
             ],
             temperature=0
         )
         return response.choices[0].message.content
-'''
+
 
 # RAGKnowledgePromptAgent class definition
 class RAGKnowledgePromptAgent:

@@ -32,3 +32,4 @@ def check_knowledge_usage(response):
 knowledge_agent_response = knowledge_agent.respond(prompt)
 agent_check = check_knowledge_usage(knowledge_agent_response)
 print(f"Agent is using provided knowledge: {agent_check}")
+print(f"\nAgent's response: {knowledge_agent_response}")

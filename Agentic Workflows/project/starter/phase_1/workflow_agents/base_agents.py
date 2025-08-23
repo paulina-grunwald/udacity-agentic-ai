@@ -71,7 +71,7 @@ class KnowledgeAugmentedPromptAgent:
 
     def respond(self, input_text):
         """Generate a response using the OpenAI API."""
-        client = OpenAI(api_key=self.openai_api_key,base_url = "https://openai.vocareum.com/v1")
+        client = OpenAI(api_key=self.openai_api_key, base_url="https://openai.vocareum.com/v1")
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
@@ -334,21 +334,30 @@ class RoutingAgent():
         return best_agent["func"](prompt)
 
 
-# class ActionPlanningAgent:
+class ActionPlanningAgent:
 
-#     def __init__(self, openai_api_key, knowledge):
-#         # TODO: 1 - Initialize the agent attributes here
+    def __init__(self, openai_api_key, knowledge):
+      self.openai_api_key = openai_api_key
+      self.knowledge = knowledge
 
-#     def extract_steps_from_prompt(self, prompt):
+    def extract_steps_from_prompt(self, prompt):
+        client = OpenAI(api_key=self.openai_api_key, base_url="https://openai.vocareum.com/v1")
+        system_prompt = f"You are an action planning agent. Using your knowledge, you extract from the user prompt the steps requested to complete the action the user is asking for. You return the steps as a list. Only return the steps in your knowledge. Forget any previous context. This is your knowledge: {self.knowledge}"
 
-#         # TODO: 2 - Instantiate the OpenAI client using the provided API key
-#         # TODO: 3 - Call the OpenAI API to get a response from the "gpt-3.5-turbo" model.
-#         # Provide the following system prompt along with the user's prompt:
-#         # "You are an action planning agent. Using your knowledge, you extract from the user prompt the steps requested to complete the action the user is asking for. You return the steps as a list. Only return the steps in your knowledge. Forget any previous context. This is your knowledge: {pass the knowledge here}"
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                # TODO: 3 - Add a system prompt instructing the agent to assume the defined persona and explicitly forget previous context.
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0
+        )
 
-#         response_text = ""  # TODO: 4 - Extract the response text from the OpenAI API response
+        # TODO: 4 - Return only the textual content of the response, not the full JSON payload.
+        response_text = response.choices[0].message.content
 
-#         # TODO: 5 - Clean and format the extracted steps by removing empty lines and unwanted text
-#         steps = response_text.split("\n")
+        # TODO: 5 - Clean and format the extracted steps by removing empty lines and unwanted text
+        steps = [step.strip() for step in response_text.split("\n") if step.strip()]
 
-#         return steps
+        return steps

@@ -119,7 +119,7 @@ agents = [product_manager_knowledge_agent, program_manager_evaluation_agent, dev
 # Support functions
 def product_manager_support_function(query):
     initial_response = product_manager_knowledge_agent.respond(query)
-    evaluation_result = product_manager_knowledge_agent.evaluate(query)
+    evaluation_result = product_manager_evaluation_agent.evaluate(query)
     return evaluation_result['final_response']
 
 def program_manager_support_function(query):

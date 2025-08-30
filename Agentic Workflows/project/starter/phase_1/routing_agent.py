@@ -3,9 +3,7 @@ from workflow_agents.base_agents import KnowledgeAugmentedPromptAgent, RoutingAg
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
-
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
 persona = "You are a college professor"

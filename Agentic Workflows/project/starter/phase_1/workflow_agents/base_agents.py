@@ -86,7 +86,8 @@ class KnowledgeAugmentedPromptAgent:
 # RAGKnowledgePromptAgent class definition
 class RAGKnowledgePromptAgent:
     """
-    An agent that uses Retrieval-Augmented Generation (RAG) to find knowledge from a large corpus and leverages embeddings to respond to prompts based solely on retrieved information.
+    An agent that uses Retrieval-Augmented Generation (RAG) to find knowledge from a large corpus
+    and leverages embeddings to respond to prompts based solely on retrieved information.
     """
 
     def __init__(self, openai_api_key, persona, chunk_size=2000, chunk_overlap=100):
@@ -219,8 +220,6 @@ class RAGKnowledgePromptAgent:
         )
 
         return response.choices[0].message.content
-
-
 class EvaluationAgent:
 
     def __init__(self, openai_api_key, persona, evaluation_criteria, worker_agent, max_interactions):
@@ -270,6 +269,7 @@ class EvaluationAgent:
                 )
                 response = client.chat.completions.create(
                     model="gpt-3.5-turbo",
+                    temperature=0,
                       messages=[ {"role": "system", "content": f"You are {self.persona}. Forget all previous context."},{"role": "user", "content": instruction_prompt}]
                 )
                 instructions = response.choices[0].message.content.strip()

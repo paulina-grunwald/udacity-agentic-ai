@@ -139,47 +139,42 @@ class RAGKnowledgePromptAgent:
         return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
     def chunk_text(self, text):
-        """
-        Splits text into manageable chunks, attempting natural breaks.
+      """
+      Splits text into manageable chunks, attempting natural breaks.
+      Parameters:
+      text (str): Text to split into chunks.
+      Returns:
+      list: List of dictionaries containing chunk metadata.
+      """
+      separator = "\n"
+      text = re.sub(r'\s+', ' ', text).strip()
+      if len(text) <= self.chunk_size:
+          return [{"chunk_id": 0, "text": text, "chunk_size": len(text)}]
+      chunks, start, chunk_id = [], 0, 0
+      while start < len(text):
+          end = min(start + self.chunk_size, len(text))
+          if separator in text[start:end]:
+              end = start + text[start:end].rindex(separator) + len(separator)
+          chunks.append({
+              "chunk_id": chunk_id,
+              "text": text[start:end],
+              "chunk_size": end - start,
+              "start_char": start,
+              "end_char": end
+          })
+          # Fix: Check if we've reached the end of the text
+          if end == len(text):
+              break
+          else:
+              start = end - self.chunk_overlap
 
-        Parameters:
-        text (str): Text to split into chunks.
-
-        Returns:
-        list: List of dictionaries containing chunk metadata.
-        """
-        separator = "\n"
-        text = re.sub(r'\s+', ' ', text).strip()
-
-        if len(text) <= self.chunk_size:
-            return [{"chunk_id": 0, "text": text, "chunk_size": len(text)}]
-
-        chunks, start, chunk_id = [], 0, 0
-
-        while start < len(text):
-            end = min(start + self.chunk_size, len(text))
-            if separator in text[start:end]:
-                end = start + text[start:end].rindex(separator) + len(separator)
-
-            chunks.append({
-                "chunk_id": chunk_id,
-                "text": text[start:end],
-                "chunk_size": end - start,
-                "start_char": start,
-                "end_char": end
-            })
-
-            start = end - self.chunk_overlap
-            chunk_id += 1
-
-        with open(f"chunks-{self.unique_filename}", 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=["text", "chunk_size"])
-            writer.writeheader()
-            for chunk in chunks:
-                writer.writerow({k: chunk[k] for k in ["text", "chunk_size"]})
-
-        return chunks
-
+          chunk_id += 1
+      with open(f"chunks-{self.unique_filename}", 'w', newline='', encoding='utf-8') as csvfile:
+          writer = csv.DictWriter(csvfile, fieldnames=["text", "chunk_size"])
+          writer.writeheader()
+          for chunk in chunks:
+              writer.writerow({k: chunk[k] for k in ["text", "chunk_size"]})
+      return chunks
     def calculate_embeddings(self):
         """
         Calculates embeddings for each chunk and stores them in a CSV file.

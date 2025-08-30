@@ -12,8 +12,8 @@ from dotenv import load_dotenv
 load_dotenv()
 openai_api_key = os.getenv("OPENAI_API_KEY")
 
-#Load the product spec document Product-Spec-Email-Router.txt into a variable called product_spec
-with open('Product-Spec-Email-Router.txt', 'r') as file: product_spec = file.read()
+product_spec_path = os.path.join(current_dir, 'Product-Spec-Email-Router.txt')
+with open(product_spec_path, 'r') as file: product_spec = file.read()
 
 
 # Instantiate all the agents

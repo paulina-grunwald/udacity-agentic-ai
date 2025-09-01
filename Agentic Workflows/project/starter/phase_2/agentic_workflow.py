@@ -19,16 +19,13 @@ with open(product_spec_path, 'r') as file: product_spec = file.read()
 # Instantiate all the agents
 # Action Planning Agent
 knowledge_action_planning = (
-    "Stories are defined from a product spec by identifying a "
-    "persona, an action, and a desired outcome for each story. "
-    "Each story represents a specific functionality of the product "
-    "described in the specification. \n"
-    "Features are defined by grouping related user stories. \n"
-    "Tasks are defined for each story and represent the engineering "
-    "work required to develop the product. \n"
-    "A development Plan for a product contains all these components"
+    "Create a comprehensive development plan, break it down into exactly 3 sequential steps:\n"
+    "Step 1: Generate user stories for Email Router - Create user stories in the format 'As a [user], I want [feature] so that [benefit]' based on the Email Router product specification\n"
+    "Step 2: Define product features for Email Router - Group related user stories into features with Feature Name, Description, Key Functionality, and User Benefit\n"
+    "Step 3: Create engineering tasks for Email Router - Define development tasks with Task ID, Title, Related User Story, Description, Acceptance Criteria, Effort, and Dependencies\n"
+    "Return exactly these 3 steps. Each step should be a clear action statement."
 )
-# TODO: 4 - Instantiate an action_planning_agent using the 'knowledge_action_planning'
+
 action_planning_agent = ActionPlanningAgent(openai_api_key,knowledge_action_planning)
 # Product Manager - Knowledge Augmented Prompt Agent
 persona_product_manager = "You are a Product Manager, you are responsible for defining the user stories for a product."
@@ -88,11 +85,9 @@ program_manager_evaluation_agent = EvaluationAgent(
 persona_dev_engineer = "You are a Development Engineer, you are responsible for defining the development tasks for a product."
 knowledge_dev_engineer = "Development tasks are defined by identifying what needs to be built to implement each user story."
 # Instantiate a development_engineer_knowledge_agent using 'persona_dev_engineer' and 'knowledge_dev_engineer'
-# (This is a necessary step before TODO 9. Students should add the instantiation code here.)
 development_engineer_knowledge_agent=KnowledgeAugmentedPromptAgent(openai_api_key, persona_dev_engineer, knowledge_dev_engineer)
 # Development Engineer - Evaluation Agent
 persona_dev_engineer_eval = "You are an evaluation agent that checks the answers of other worker agents."
-# Instantiate a development_engineer_evaluation_agent using 'persona_dev_engineer_eval' and the evaluation criteria below.
 
 dev_eng_evaluation_criteria = (
     "The answer should be tasks following this exact structure: "
@@ -134,9 +129,9 @@ def development_engineer_support_function(query):
 
 agents= [
    {
-        "name": "product manager agent",
-        "description": "Defines user stories for product features",
-        "func": product_manager_support_function
+      "name": "product manager agent",
+      "description": "Defines user stories for product features",
+      "func": product_manager_support_function
     },
     {
       "name": "program manager agent",
@@ -155,9 +150,7 @@ routing_agent = RoutingAgent(openai_api_key, agents)
 
 print("\n*** Workflow execution started ***\n")
 # Workflow Prompt
-# ****
 workflow_prompt = "What would the development tasks for this product be?"
-# ****
 print(f"Task to complete in this workflow, workflow prompt = {workflow_prompt}")
 
 print("\nDefining workflow steps from the workflow prompt")

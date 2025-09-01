@@ -1,0 +1,151 @@
+❯ python3 agentic_workflow.py
+
+*** Workflow execution started ***
+
+Task to complete in this workflow, workflow prompt = What would the development tasks for this product be?
+
+Defining workflow steps from the workflow prompt
+
+Extracted 3 steps from the workflow prompt
+
+--- Step 1/3 ---
+Executing: 1. Generate user stories for Email Router - Create user stories in the format 'As a [user], I want [feature] so that [benefit]' based on the Email Router product specification
+0.6101978197480691
+0.5136801681691467
+0.47871545110738095
+[Router] Best agent: product manager agent (score=0.610)
+
+--- Interaction 1 ---
+ Step 1: Worker agent generates a response to the prompt
+Prompt:
+1. Generate user stories for Email Router - Create user stories in the format 'As a [user], I want [feature] so that [benefit]' based on the Email Router product specification
+Worker Agent Response:
+As a Customer Support Representative, I want the Email Ingestion System to seamlessly integrate with email services via SMTP, IMAP, and RESTful APIs so that I can efficiently retrieve and process incoming emails in real-time.
+
+As a Subject Matter Expert (SME), I want the Message Classification Module to analyze email content using LLM-based classifiers to determine intent and category so that I receive only relevant, complex inquiries, improving my efficiency and job satisfaction.
+
+As an IT Administrator, I want the Knowledge Base Integration to continuously update the knowledge base with new information from resolved inquiries so that the system remains up-to-date and accurate in providing responses.
+
+As a Customer Support Representative, I want the Response Generation Engine to deploy a RAG system to generate contextually accurate and human-like responses so that I can provide consistent and high-quality responses to routine inquiries.
+
+As a Subject Matter Expert (SME), I want the Routing Logic to develop a rules-based engine to assign emails to appropriate SMEs based on content analysis so that I receive complex inquiries that match my expertise, improving the accuracy and speed of responses.
+
+As an IT Administrator, I want the User Interface to provide a comprehensive dashboard for monitoring system performance, including metrics on response times and accuracy so that I can track the system's efficiency and make informed decisions for improvements.
+ Step 2: Evaluator agent judges the response
+Evaluator Agent Evaluation:
+Yes, the answer meets the criteria. Each user story follows the structure of "As a [type of user], I want [an action or feature] so that [benefit/value]."
+ Step 3: Check if evaluation is positive
+✅ Final solution accepted.
+Result: As a Customer Support Representative, I want the Email Ingestion System to seamlessly integrate with email services via SMTP, IMAP, and RESTful APIs so that I can efficiently retrieve and process inco...
+
+--- Step 2/3 ---
+Executing: 2. Define product features for Email Router - Group related user stories into features with Feature Name, Description, Key Functionality, and User Benefit
+0.5587710565756955
+0.5669371946937507
+0.4035343248636203
+[Router] Best agent: program manager agent (score=0.567)
+
+--- Interaction 1 ---
+ Step 1: Worker agent generates a response to the prompt
+Prompt:
+2. Define product features for Email Router - Group related user stories into features with Feature Name, Description, Key Functionality, and User Benefit
+Worker Agent Response:
+Feature Name: Email Integration
+Description: This feature allows users to seamlessly integrate their email accounts with the router.
+Key Functionality: Syncing multiple email accounts, setting up email filters, and managing email notifications.
+User Benefit: Users can easily manage all their email communications in one place, improving efficiency and organization.
+
+Feature Name: Auto-forwarding
+Description: This feature enables users to automatically forward specific emails to designated recipients.
+Key Functionality: Setting up forwarding rules based on sender, subject, or keywords.
+User Benefit: Users can ensure important emails are promptly forwarded to the right recipients without manual intervention.
+
+Feature Name: Email Priority Routing
+Description: This feature prioritizes incoming emails based on predefined criteria.
+Key Functionality: Assigning priority levels to specific senders or keywords, routing high-priority emails to designated folders.
+User Benefit: Users can quickly identify and respond to urgent emails, improving productivity and responsiveness.
+
+Feature Name: Email Tracking
+Description: This feature tracks the status of sent emails and provides notifications on email opens and clicks.
+Key Functionality: Real-time email tracking, detailed email engagement analytics.
+User Benefit: Users can gain insights into recipient engagement, allowing for more informed follow-ups and communication strategies.
+ Step 2: Evaluator agent judges the response
+Evaluator Agent Evaluation:
+Yes, the answer meets the criteria. Each feature is presented with a clear title, a brief description of what the feature does and its purpose, specific key functionalities, and user benefits.
+ Step 3: Check if evaluation is positive
+✅ Final solution accepted.
+Result: Feature Name: Email Integration
+Description: This feature allows users to seamlessly integrate their email accounts with the router.
+Key Functionality: Syncing multiple email accounts, setting up emai...
+
+--- Step 3/3 ---
+Executing: 3. Create engineering tasks for Email Router - Define development tasks with Task ID, Title, Related User Story, Description, Acceptance Criteria, Effort, and Dependencies
+0.44802766741995054
+0.3905320806012435
+0.617137811470854
+[Router] Best agent: development engineer agent (score=0.617)
+
+--- Interaction 1 ---
+ Step 1: Worker agent generates a response to the prompt
+Prompt:
+3. Create engineering tasks for Email Router - Define development tasks with Task ID, Title, Related User Story, Description, Acceptance Criteria, Effort, and Dependencies
+Worker Agent Response:
+Task ID: 001
+Title: Set up email server configuration
+Related User Story: As a user, I want to configure the email server settings in the Email Router application
+Description: This task involves setting up the email server configuration within the Email Router application to enable sending and receiving emails.
+Acceptance Criteria: Email server settings are successfully configured and tested for sending and receiving emails within the application.
+Effort: 4 hours
+Dependencies: Access to email server settings and configurations.
+
+Task ID: 002
+Title: Implement email parsing functionality
+Related User Story: As a user, I want the Email Router application to parse incoming emails and extract relevant information
+Description: This task involves implementing the functionality to parse incoming emails within the Email Router application and extract relevant information such as sender, subject, and body.
+Acceptance Criteria: Incoming emails are successfully parsed, and relevant information is extracted and stored within the application.
+Effort: 8 hours
+Dependencies: Access to email parsing libraries and tools.
+
+Task ID: 003
+Title: Develop email filtering feature
+Related User Story: As a user, I want to set up email filters in the Email Router application to organize incoming emails
+Description: This task involves developing the feature to set up email filters within the Email Router application to automatically organize incoming emails based on predefined criteria.
+Acceptance Criteria: Email filters can be created, edited, and applied to incoming emails for automatic organization within the application.
+Effort: 12 hours
+Dependencies: Access to email filtering algorithms and logic.
+ Step 2: Evaluator agent judges the response
+Evaluator Agent Evaluation:
+Yes, the provided answer meets the criteria as it follows the exact structure requested for each task listed. Each task includes a unique Task ID, Task Title, Related User Story, Description, Acceptance Criteria, Estimated Effort, and Dependencies.
+ Step 3: Check if evaluation is positive
+✅ Final solution accepted.
+Result: Task ID: 001
+Title: Set up email server configuration
+Related User Story: As a user, I want to configure the email server settings in the Email Router application
+Description: This task involves setti...
+
+*** Workflow execution completed ***
+
+Final output:
+Task ID: 001
+Title: Set up email server configuration
+Related User Story: As a user, I want to configure the email server settings in the Email Router application
+Description: This task involves setting up the email server configuration within the Email Router application to enable sending and receiving emails.
+Acceptance Criteria: Email server settings are successfully configured and tested for sending and receiving emails within the application.
+Effort: 4 hours
+Dependencies: Access to email server settings and configurations.
+
+Task ID: 002
+Title: Implement email parsing functionality
+Related User Story: As a user, I want the Email Router application to parse incoming emails and extract relevant information
+Description: This task involves implementing the functionality to parse incoming emails within the Email Router application and extract relevant information such as sender, subject, and body.
+Acceptance Criteria: Incoming emails are successfully parsed, and relevant information is extracted and stored within the application.
+Effort: 8 hours
+Dependencies: Access to email parsing libraries and tools.
+
+Task ID: 003
+Title: Develop email filtering feature
+Related User Story: As a user, I want to set up email filters in the Email Router application to organize incoming emails
+Description: This task involves developing the feature to set up email filters within the Email Router application to automatically organize incoming emails based on predefined criteria.
+Acceptance Criteria: Email filters can be created, edited, and applied to incoming emails for automatic organization within the application.
+Effort: 12 hours
+Dependencies: Access to email filtering algorithms and logic

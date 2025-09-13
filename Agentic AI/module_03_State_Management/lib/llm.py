@@ -3,7 +3,6 @@ from pydantic import BaseModel
 from openai import OpenAI
 from lib.messages import (
     AnyMessage,
-    TokenUsage,
     AIMessage,
     BaseMessage,
     UserMessage,
@@ -17,22 +16,17 @@ class LLM:
         model: str = "gpt-4o-mini",
         temperature: float = 0.0,
         tools: Optional[List[Tool]] = None,
-        openai_api_key: Optional[str] = None,
+        api_key: Optional[str] = None,
         base_url: Optional[str] = None
     ):
         self.model = model
         self.temperature = temperature
-        self.openai_api_key = openai_api_key
-        self.base_url = base_url
-        
-        # Initialize OpenAI client with proper parameters
-        if openai_api_key:
-            if base_url:
-                self.client = OpenAI(api_key=openai_api_key, base_url=base_url)
-            else:
-                self.client = OpenAI(api_key=openai_api_key)
+        if api_key and base_url:
+            self.client = OpenAI(api_key=api_key, base_url=base_url)
+        elif api_key:
+            self.client = OpenAI(api_key=api_key)
         else:
-            self.client = OpenAI()  # Uses environment variables
+            self.client = OpenAI()
         self.tools: Dict[str, Tool] = {
             tool.name: tool for tool in (tools or [])
         }
@@ -45,7 +39,6 @@ class LLM:
             "model": self.model,
             "temperature": self.temperature,
             "messages": [m.dict() for m in messages],
-
         }
 
         if self.tools:
@@ -64,7 +57,7 @@ class LLM:
         else:
             raise ValueError(f"Invalid input type {type(input)}.")
 
-    def invoke(self,
+    def invoke(self, 
                input: str | BaseMessage | List[BaseMessage],
                response_format: BaseModel = None,) -> AIMessage:
         messages = self._convert_input(input)
@@ -77,16 +70,7 @@ class LLM:
         choice = response.choices[0]
         message = choice.message
 
-        token_usage = None
-        if response.usage:
-            token_usage = TokenUsage(
-                prompt_tokens=response.usage.prompt_tokens,
-                completion_tokens=response.usage.completion_tokens,
-                total_tokens=response.usage.total_tokens
-            )
-
         return AIMessage(
             content=message.content,
-            tool_calls=message.tool_calls,
-            token_usage=token_usage
+            tool_calls=message.tool_calls
         )

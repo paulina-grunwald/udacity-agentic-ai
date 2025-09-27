@@ -94,6 +94,11 @@ class Agent:
         """Step logic: Execute any pending tool calls"""
         tool_calls = state["current_tool_calls"] or []
         tool_messages = []
+        
+        # Print tool names if any tool calls exist
+        if tool_calls:
+            tool_names = [call.function.name for call in tool_calls]
+            print(f"[StateMachine] Executing tools: {', '.join(tool_names)}")
 
         for call in tool_calls:
             # Access tool call data correctly

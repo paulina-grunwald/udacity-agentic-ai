@@ -4,15 +4,23 @@ import os
 import time
 import dotenv
 import ast
+from pathlib import Path
 from sqlalchemy.sql import text
 from datetime import datetime, timedelta
 from typing import Dict, List, Union
 from sqlalchemy import create_engine, Engine
+from openai import OpenAI
+from smolagents import CodeAgent, ToolCallingAgent, tool, LiteLLMModel
+from dotenv import load_dotenv
 
-# Create an SQLite database
-db_engine = create_engine("sqlite:///munder_difflin.db")
+load_dotenv()
 
-# List containing the different kinds of papers 
+# Get script directory for resolving relative paths
+SCRIPT_DIR = Path(__file__).parent
+DB_PATH = SCRIPT_DIR / "munder_difflin.db"
+db_engine = create_engine(f"sqlite:///{DB_PATH}")
+
+# List containing the different kinds of papers
 paper_supplies = [
     # Paper Types (priced per sheet unless specified)
     {"item_name": "A4 paper",                         "category": "paper",        "unit_price": 0.05},
@@ -126,7 +134,7 @@ def generate_sample_inventory(paper_supplies: list, coverage: float = 0.4, seed:
     # Return inventory as a pandas DataFrame
     return pd.DataFrame(inventory)
 
-def init_database(db_engine: Engine, seed: int = 137) -> Engine:    
+def init_database(db_engine: Engine, seed: int = 137) -> Engine:
     """
     Set up the Munder Difflin database with all required tables and initial records.
 
@@ -168,14 +176,14 @@ def init_database(db_engine: Engine, seed: int = 137) -> Engine:
         # ----------------------------
         # 2. Load and initialize 'quote_requests' table
         # ----------------------------
-        quote_requests_df = pd.read_csv("quote_requests.csv")
+        quote_requests_df = pd.read_csv(SCRIPT_DIR / "quote_requests.csv")
         quote_requests_df["id"] = range(1, len(quote_requests_df) + 1)
         quote_requests_df.to_sql("quote_requests", db_engine, if_exists="replace", index=False)
 
         # ----------------------------
         # 3. Load and transform 'quotes' table
         # ----------------------------
-        quotes_df = pd.read_csv("quotes.csv")
+        quotes_df = pd.read_csv(SCRIPT_DIR / "quotes.csv")
         quotes_df["request_id"] = range(1, len(quotes_df) + 1)
         quotes_df["order_date"] = initial_date
 
@@ -296,7 +304,7 @@ def get_all_inventory(as_of_date: str) -> Dict[str, int]:
     """
     Retrieve a snapshot of available inventory as of a specific date.
 
-    This function calculates the net quantity of each item by summing 
+    This function calculates the net quantity of each item by summing
     all stock orders and subtracting all sales up to and including the given date.
 
     Only items with positive stock are included in the result.
@@ -307,6 +315,11 @@ def get_all_inventory(as_of_date: str) -> Dict[str, int]:
     Returns:
         Dict[str, int]: A dictionary mapping item names to their current stock levels.
     """
+    # FIX: Convert date-only format to datetime with end-of-day time (23:59:59)
+    # This ensures queries include all records from the specified date
+    if len(as_of_date) == 10:  # Just date, no time
+        as_of_date = f"{as_of_date}T23:59:59"
+
     # SQL query to compute stock levels per item as of the given date
     query = """
         SELECT
@@ -333,7 +346,7 @@ def get_stock_level(item_name: str, as_of_date: Union[str, datetime]) -> pd.Data
     """
     Retrieve the stock level of a specific item as of a given date.
 
-    This function calculates the net stock by summing all 'stock_orders' and 
+    This function calculates the net stock by summing all 'stock_orders' and
     subtracting all 'sales' transactions for the specified item up to the given date.
 
     Args:
@@ -347,10 +360,15 @@ def get_stock_level(item_name: str, as_of_date: Union[str, datetime]) -> pd.Data
     if isinstance(as_of_date, datetime):
         as_of_date = as_of_date.isoformat()
 
+    # Ensure date includes time component for proper comparison
+    # If date is just YYYY-MM-DD, append end of day
+    if len(as_of_date) == 10:  # Just date, no time
+        as_of_date = f"{as_of_date}T23:59:59"
+
     # SQL query to compute net stock level for the item
     stock_query = """
         SELECT
-            item_name,
+            :item_name as item_name,
             COALESCE(SUM(CASE
                 WHEN transaction_type = 'stock_orders' THEN units
                 WHEN transaction_type = 'sales' THEN -units
@@ -429,6 +447,10 @@ def get_cash_balance(as_of_date: Union[str, datetime]) -> float:
         # Convert date to ISO format if it's a datetime object
         if isinstance(as_of_date, datetime):
             as_of_date = as_of_date.isoformat()
+
+        # Ensure date includes time component for proper comparison
+        if len(as_of_date) == 10:  # Just date, no time
+            as_of_date = f"{as_of_date}T23:59:59"
 
         # Query all transactions on or before the specified date
         transactions = pd.read_sql(
@@ -588,34 +610,179 @@ def search_quote_history(search_terms: List[str], limit: int = 5) -> List[Dict]:
 ########################
 ########################
 
+# Initialize LLM client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# Set up and load your env parameters and instantiate your model.
+# LLM model for smolagents
+model = LiteLLMModel(model_id="gpt-4o-mini", api_key=os.getenv("OPENAI_API_KEY"))
 
+########################
+# INVENTORY AGENT TOOLS
+########################
 
-"""Set up tools for your agents to use, these should be methods that combine the database functions above
- and apply criteria to them to ensure that the flow of the system is correct."""
+@tool
+def check_item_stock(item_name: str, date: str) -> dict:
+    """
+    Check the current stock level for a specific item as of a given date.
 
+    Args:
+        item_name: The exact name of the item to check
+        date: Date in ISO format (YYYY-MM-DD)
 
-# Tools for inventory agent
+    Returns:
+        dict: Contains item_name and current_stock level
+    """
+    result = get_stock_level(item_name, date)
+    if result.empty:
+        return {"item_name": item_name, "current_stock": 0}
+    return {
+        "item_name": result["item_name"].iloc[0],
+        "current_stock": int(result["current_stock"].iloc[0])
+    }
 
+@tool
+def check_all_inventory(date: str) -> dict:
+    """
+    Get a complete snapshot of all inventory items and their stock levels as of a given date.
 
-# Tools for quoting agent
+    Args:
+        date: Date in ISO format (YYYY-MM-DD)
 
+    Returns:
+        dict: Mapping of item names to their current stock levels
+    """
+    return get_all_inventory(date)
 
-# Tools for ordering agent
+@tool
+def get_available_items() -> list:
+    """
+    Get a list of all items available in the inventory catalog with their prices and categories.
 
+    Returns:
+        list: List of dicts containing item_name, category, and unit_price
+    """
+    inventory_df = pd.read_sql("SELECT item_name, category, unit_price FROM inventory", db_engine)
+    return inventory_df.to_dict(orient="records")
 
-# Set up your agents and create an orchestration agent that will manage them.
+@tool
+def find_similar_items(search_term: str) -> list:
+    """
+    Find items in inventory that match or are similar to a search term.
+    Useful for mapping customer requests to actual inventory items.
+
+    Args:
+        search_term: The term to search for (e.g., "glossy", "A4", "cardstock")
+
+    Returns:
+        list: List of matching items with their details
+    """
+    inventory_df = pd.read_sql("SELECT * FROM inventory", db_engine)
+    # Case-insensitive search in item names
+    matches = inventory_df[
+        inventory_df["item_name"].str.lower().str.contains(search_term.lower(), na=False)
+    ]
+    return matches.to_dict(orient="records")
+
+@tool
+def get_item_price(item_name: str) -> float:
+    """
+    Retrieve the unit price of a specific item from the inventory.
+
+    Args:
+        item_name: The exact name of the item to look up
+
+    Returns:
+        float: The unit price of the item, or -1.0 if not found
+    """
+    inventory_df = pd.read_sql(
+        "SELECT item_name, unit_price FROM inventory WHERE item_name = :item_name",
+        db_engine,
+        params={"item_name": item_name}
+    )
+    if inventory_df.empty:
+        return -1.0
+    return float(inventory_df["unit_price"].iloc[0])
+
+@tool
+def find_items_by_category(category: str) -> list:
+    """
+    Find all items in inventory that belong to a specific category.
+
+    Args:
+        category: Category to filter by. Options: 'paper', 'product', 'large_format', 'specialty'
+
+    Returns:
+        list: List of items in that category with their details
+    """
+    inventory_df = pd.read_sql(
+        "SELECT * FROM inventory WHERE category = :category",
+        db_engine,
+        params={"category": category}
+    )
+    return inventory_df.to_dict(orient="records")
+
+########################
+# AGENT SETUP
+########################
+
+# Create Inventory Agent using the external tools
+inventory_agent = ToolCallingAgent(
+    tools=[
+        check_item_stock,
+        check_all_inventory,
+        get_available_items,
+        find_similar_items,
+        get_item_price,
+        find_items_by_category
+    ],
+    model=model,
+    max_steps=5,
+    name="InventoryAgent",
+    description="""You are the Inventory Agent for Munder Difflin paper company.
+
+Your responsibilities:
+1. Check stock levels for specific items on specific dates
+2. Search for items in inventory catalog by keywords or category
+3. Map customer requests to actual inventory item names
+4. Report current inventory status and prices
+5. Identify if items are in stock or out of stock
+
+IMPORTANT RULES:
+- Always include the DATE in your stock checks
+- Use exact item names from the inventory when reporting
+- When customer requests don't match exact item names, use find_similar_items to search
+- Use find_items_by_category when asked about categories: 'paper', 'product', 'large_format', 'specialty'
+- Report stock levels as integers
+- If an item is not in the catalog, clearly state that
+
+Example interactions:
+- "Check if we have Glossy paper in stock on 2025-04-01" -> Use check_item_stock
+- "What items do we have related to 'cardstock'?" -> Use find_similar_items
+- "Show me all inventory on 2025-04-01" -> Use check_all_inventory
+- "What paper items do we have?" -> Use find_items_by_category with category='paper'
+- "What's the price of A4 paper?" -> Use get_item_price
+"""
+)
+
 
 
 # Run your test scenarios by writing them here. Make sure to keep track of them.
+# Individual agent tests are in test_agents.py
 
 def run_test_scenarios():
-    
-    print("Initializing Database...")
-    init_database()
+    """
+    Run test scenarios from quote_requests_sample.csv
+    """
+
+    # Initialize database if it doesn't exist
+    if not DB_PATH.exists():
+        print("Database not found. Initializing...")
+        init_database(db_engine)
+    else:
+        print("Using existing database...")
+
     try:
-        quote_requests_sample = pd.read_csv("quote_requests_sample.csv")
+        quote_requests_sample = pd.read_csv(SCRIPT_DIR / "quote_requests_sample.csv")
         quote_requests_sample["request_date"] = pd.to_datetime(
             quote_requests_sample["request_date"], format="%m/%d/%y", errors="coerce"
         )
@@ -624,14 +791,6 @@ def run_test_scenarios():
     except Exception as e:
         print(f"FATAL: Error loading test data: {e}")
         return
-
-    quote_requests_sample = pd.read_csv("quote_requests_sample.csv")
-
-    # Sort by date
-    quote_requests_sample["request_date"] = pd.to_datetime(
-        quote_requests_sample["request_date"]
-    )
-    quote_requests_sample = quote_requests_sample.sort_values("request_date")
 
     # Get initial state
     initial_date = quote_requests_sample["request_date"].min().strftime("%Y-%m-%d")
@@ -668,6 +827,7 @@ def run_test_scenarios():
         ############
         ############
 
+        # TODO: Implement multi-agent system orchestration here
         # response = call_your_multi_agent_system(request_with_date)
 
         # Update state
@@ -704,4 +864,6 @@ def run_test_scenarios():
 
 
 if __name__ == "__main__":
+    # Run test scenarios
+    # To test individual agents, run: python test_agents.py
     results = run_test_scenarios()

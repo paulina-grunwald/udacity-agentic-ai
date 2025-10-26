@@ -15,11 +15,8 @@ from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from project_starter import (
-    search_quote_history,
-    db_engine,
-    model,
-)
+from config import model
+from helpers import search_quote_history, db_engine
 
 
 @tool
@@ -56,8 +53,7 @@ def calculate_quote_price(items_with_quantities: List[Dict]) -> Dict:
     - 1001+ total units: 15% discount
 
     Args:
-        items_with_quantities: List of dicts with 'item_name', 'quantity', and 'unit_price'
-                              Example: [{"item_name": "A4 paper", "quantity": 100, "unit_price": 0.05}]
+      items_with_quantities: List of dicts with 'item_name', 'quantity', and 'unit_price'. Example: [{"item_name": "A4 paper", "quantity": 100, "unit_price": 0.05}]
 
     Returns:
         Dictionary containing:
@@ -75,7 +71,7 @@ def calculate_quote_price(items_with_quantities: List[Dict]) -> Dict:
             "discount_amount": 0.0,
             "total": 0.0,
             "total_units": 0,
-            "breakdown": []
+            "breakdown": [],
         }
 
     subtotal = 0.0
@@ -91,12 +87,14 @@ def calculate_quote_price(items_with_quantities: List[Dict]) -> Dict:
         subtotal += item_total
         total_units += quantity
 
-        breakdown.append({
-            "item_name": item_name,
-            "quantity": quantity,
-            "unit_price": unit_price,
-            "item_total": round(item_total, 2)
-        })
+        breakdown.append(
+            {
+                "item_name": item_name,
+                "quantity": quantity,
+                "unit_price": unit_price,
+                "item_total": round(item_total, 2),
+            }
+        )
 
     if total_units <= 500:
         discount_percent = 0.0
@@ -114,7 +112,7 @@ def calculate_quote_price(items_with_quantities: List[Dict]) -> Dict:
         "discount_amount": round(discount_amount, 2),
         "total": round(total, 2),
         "total_units": total_units,
-        "breakdown": breakdown
+        "breakdown": breakdown,
     }
 
 
@@ -137,21 +135,19 @@ def get_item_prices(item_names: List[str]) -> List[Dict]:
         inventory_df = pd.read_sql(
             "SELECT item_name, unit_price FROM inventory WHERE item_name = :item_name",
             db_engine,
-            params={"item_name": item_name}
+            params={"item_name": item_name},
         )
 
         if not inventory_df.empty:
-            results.append({
-                "item_name": item_name,
-                "unit_price": float(inventory_df["unit_price"].iloc[0]),
-                "found": True
-            })
+            results.append(
+                {
+                    "item_name": item_name,
+                    "unit_price": float(inventory_df["unit_price"].iloc[0]),
+                    "found": True,
+                }
+            )
         else:
-            results.append({
-                "item_name": item_name,
-                "unit_price": 0.0,
-                "found": False
-            })
+            results.append({"item_name": item_name, "unit_price": 0.0, "found": False})
 
     return results
 
@@ -167,39 +163,39 @@ quoting_agent = ToolCallingAgent(
     name="QuotingAgent",
     description="""You are the Quoting Agent for Munder Difflin paper company.
 
-Your responsibilities:
-1. Search historical quotes to understand pricing patterns for similar orders
-2. Calculate accurate quotes with appropriate bulk discounts
-3. Provide transparent, customer-facing price breakdowns
-4. Explain pricing rationale including any discounts applied
+    Your responsibilities:
+    1. Search historical quotes to understand pricing patterns for similar orders
+    2. Calculate accurate quotes with appropriate bulk discounts
+    3. Provide transparent, customer-facing price breakdowns
+    4. Explain pricing rationale including any discounts applied
 
-IMPORTANT RULES:
-- Always use exact item names from the inventory
-- Apply bulk discounts based on total units:
-  * 0-500 units: No discount
-  * 501-1000 units: 10% discount
-  * 1001+ units: 15% discount
-- Provide clear breakdowns showing:
-  * Individual item costs
-  * Subtotal before discount
-  * Discount amount and percentage (if applicable)
-  * Final total
-- Explain why discounts were or weren't applied
-- Search historical quotes for similar requests to maintain pricing consistency
-- NEVER reveal internal profit margins or cost structures
-- Format prices as currency with 2 decimal places
+    IMPORTANT RULES:
+    - Always use exact item names from the inventory
+    - Apply bulk discounts based on total units:
+      * 0-500 units: No discount
+      * 501-1000 units: 10% discount
+      * 1001+ units: 15% discount
+    - Provide clear breakdowns showing:
+      * Individual item costs
+      * Subtotal before discount
+      * Discount amount and percentage (if applicable)
+      * Final total
+    - Explain why discounts were or weren't applied
+    - Search historical quotes for similar requests to maintain pricing consistency
+    - NEVER reveal internal profit margins or cost structures
+    - Format prices as currency with 2 decimal places
 
-Example quote response format:
-"Based on your request for [items], here is your quote:
+    Example quote response format:
+    "Based on your request for [items], here is your quote:
 
-Item Breakdown:
-- [Item 1]: [qty] units × $[price] = $[total]
-- [Item 2]: [qty] units × $[price] = $[total]
+    Item Breakdown:
+    - [Item 1]: [qty] units × $[price] = $[total]
+    - [Item 2]: [qty] units × $[price] = $[total]
 
-Subtotal: $[amount]
-Bulk Discount ([X]% for [Y] total units): -$[discount]
-Total: $[final]
+    Subtotal: $[amount]
+    Bulk Discount ([X]% for [Y] total units): -$[discount]
+    Total: $[final]
 
-[Explanation of why this pricing applies, any discounts, and delivery considerations]"
-"""
+    [Explanation of why this pricing applies, any discounts, and delivery considerations]"
+""",
 )

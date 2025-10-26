@@ -1,45 +1,50 @@
 request_id,request_date,cash_balance,inventory_value,response
-1,2025-04-01,43362.2,5187.799999999999,"All requested paper supplies have been successfully ordered for delivery by April 15, 2025:
-- 200 sheets of A4 glossy paper
-- 100 sheets of heavy cardstock (white)
-- 100 sheets of colored paper (assorted colors)"
-2,2025-04-03,43362.2,5187.799999999999,"Your orders have been successfully placed: 500 sheets of colorful poster paper, 300 rolls of streamers, and 200 balloons, all scheduled for delivery by April 15, 2025."
-3,2025-04-04,43362.2,5187.799999999999,"Insufficient funds to place the order for 10,000 sheets of A4 paper, 5,000 sheets of A3 paper, and 500 reams of printer paper. Recommended actions to increase cash reserves include: 1. Reduce operational expenses. 2. Consider boosting sales or revenue. 3. Explore short-term financing. 4. Delay large purchases."
-4,2025-04-05,43362.2,5187.799999999999,"An order has been successfully created for 500 sheets of high-quality, recycled cardstock in various colors to be delivered by April 15, 2025, and 250 sheets of A4 size printer paper, which will be delivered by April 19, 2025."
-5,2025-04-05,43362.2,5187.799999999999,"Order has been successfully placed for 500 sheets of 8.5""x11"" colored paper, 300 sheets of cardstock in various colors, and 200 rolls of decorative washi tape, all to be delivered by April 15, 2025."
-6,2025-04-06,43362.2,5187.799999999999,"Order processed successfully: 500 sheets of colorful construction paper (Transaction ID: 235), 300 sheets of white printer paper, and 200 sheets of cardstock in various colors. Estimated delivery by April 14, 2025."
-7,2025-04-07,43362.2,5187.799999999999,"Your large order for paper supplies for the upcoming exhibition has been successfully placed, with the following items:
+1,2025-04-01,34912.2,5437.8,"The orders have been successfully processed as follows: 
+- 100 sheets of colored paper (assorted colors) - delivery by April 5, 2025.
+- 200 sheets of A4 glossy paper - delivery by April 5, 2025.
+- 100 sheets of heavy cardstock (white) - delivery by April 2, 2025."
+2,2025-04-03,34912.2,5437.8,"All orders have been successfully placed:
+- 200 balloons for delivery by April 15, 2025.
+- 300 rolls of streamers for delivery by April 15, 2025.
+- 500 sheets of colorful poster paper for delivery by April 15, 2025."
+3,2025-04-04,29912.199999999997,5437.8,"The order has been confirmed: 10,000 sheets of A4 paper, 5,000 sheets of A3 paper, and 500 reams of printer paper, all scheduled for delivery by April 15, 2025."
+4,2025-04-05,29912.199999999997,5437.8,"A stock order has been successfully created for 500 sheets of high-quality recycled cardstock in various colors and 250 sheets of A4 size printer paper, to be delivered by April 15, 2025 for cardstock and April 19, 2025 for printer paper."
+5,2025-04-05,29912.199999999997,5437.8,"Successfully placed orders for the supplies needed for the upcoming party. The orders include:
+- 500 sheets of 8.5""x11"" colored paper to be delivered by April 15, 2025.
+- 300 sheets of cardstock in various colors to be delivered by April 15, 2025.
+- 200 rolls of decorative washi tape to be delivered by April 15, 2025."
+6,2025-04-06,29912.2,5437.8,"The order for 500 sheets of colorful construction paper, 300 sheets of white printer paper, and 200 sheets of cardstock in various colors has been successfully placed. The estimated delivery date is April 10, 2025, and all purchases have been approved with adequate cash reserves."
+7,2025-04-07,28412.2,5437.8,"All items have been successfully ordered for the exhibition. The details are as follows:
 
-1. **300 poster boards (24"" x 36"")** - Estimated delivery date: April 19, 2025.
-2. **1000 sheets of matte A3 paper** - Order placed and expected to be delivered by April 15, 2025.
-3. **200 sheets of heavyweight cardstock** - Order placed successfully for delivery by April 15, 2025.
-4. **500 sheets of glossy A4 paper** - Since this item was out of stock, it has been replaced with **500 sheets of standard A4 paper**, which is also needed by April 15, 2025.
-
-All items will be processed, and the necessary arrangements for delivery by the mentioned dates have been made. Thank you for your order!"
-8,2025-04-07,43362.2,5187.799999999999,"Stock reorder transactions created successfully for 500 sheets of A4 glossy paper, 1000 sheets of A4 matte paper, 2000 sheets of A5 colored paper, and 3000 sheets of A4 recycled paper for delivery by April 15, 2025."
-9,2025-04-07,43362.2,5187.799999999999,"Order has been successfully placed for: 
-- 200 sheets of A4 white printer paper 
-- 100 sheets of A3 glossy paper 
-- 50 packets of 100% recycled kraft paper envelopes 
-All items will be delivered by April 10, 2025."
-13,2025-04-08,43362.2,5187.799999999999,"Order placed successfully for 500 sheets of A4 printing paper and 200 sheets of cardstock, to be delivered by April 10, 2025."
-12,2025-04-08,43362.2,5187.799999999999,"Successfully ordered the following items for delivery by April 15, 2025:
-- 500 sheets of standard printer paper
-- 200 sheets of colorful cardstock
-- 100 paper napkins"
-10,2025-04-08,43362.2,5187.799999999999,"Orders have been successfully placed for 500 sheets of high-quality glossy paper and 300 sheets of sturdy cardstock, both to be delivered by April 15, 2025."
-11,2025-04-08,43362.2,5187.799999999999,"Successfully created orders for 500 sheets of A3 glossy paper and 300 sheets of A4 matte paper, both needed by April 15, 2025."
-14,2025-04-09,43362.2,5437.799999999999,"Your large order for high-quality paper supplies has been successfully placed. You will receive 5000 sheets of A4 paper, 2000 sheets of poster paper in various colors, and 500 sheets of cardstock by April 15, 2025. The order has been approved and the total cost is $21,500. Your remaining cash balance will be $20,212.20."
-15,2025-04-12,42362.2,5437.799999999999,"The order for 10,000 sheets of A4 white paper, 5,000 sheets of A3 colored paper, and 500 reams of cardboard was placed successfully with delivery scheduled for April 15, 2025. However, the current cash balance is insufficient to fulfill the order, and all proposed purchases were rejected."
-16,2025-04-13,42362.2,5437.799999999999,"The orders for 500 sheets of A4 printer paper, 200 sheets of colorful construction paper, and 100 sheets of poster board have been processed successfully. Expected delivery dates are: A4 printer paper and colorful construction paper by April 19, 2025, and poster board by April 16, 2025."
-17,2025-04-14,41862.2,5437.799999999999,"All orders have been successfully placed: 
-- 1000 sheets of A4 white printer paper 
-- 500 sheets of A3 colored paper (assorted colors) 
-- 2000 table napkins (white) 
-- 1000 biodegradable paper cups 
-- 500 biodegradable paper plates 
+- 500 sheets of glossy A4 paper
+- 1000 sheets of matte A3 paper 
+- 300 poster boards (24"" x 36"")
+- 200 sheets of heavyweight cardstock.
 
 All supplies will be delivered by April 15, 2025."
-18,2025-04-14,41862.2,5437.799999999999,"The order for 500 sheets of high-quality white cardstock, 1000 sheets of standard printing paper, and 200 sheets of colored paper in assorted colors has been successfully processed for delivery by April 15, 2025. Stock levels are adequate."
-19,2025-04-15,40412.2,6687.799999999999,"The order for paper supplies has been successfully placed, but it has been rejected due to insufficient funds. The current cash balance is -$1,500.00, which does not allow us to proceed with the order."
-20,2025-04-17,40412.2,6687.799999999999,"Stock orders successfully created for 5,000 flyers, 2,000 posters, and 10,000 tickets, with delivery expected by May 22, 2025. Current stock levels as of April 17, 2025: 5,000 flyers, 2,000 posters, and 10,000 tickets."
+8,2025-04-07,28412.2,5437.8,"Successfully placed an order for 500 sheets of A4 glossy paper, 1000 sheets of A4 matte paper, 2000 sheets of A5 colored paper, and 3000 sheets of A4 recycled paper. All deliveries are scheduled for April 15, 2025."
+9,2025-04-07,28412.2,5437.8,"All items ordered successfully: 
+- 200 sheets of A4 white printer paper (delivery on April 10, 2025)
+- 100 sheets of A3 glossy paper (delivery on April 10, 2025)
+- 50 packets of 100% recycled kraft paper envelopes (delivery on April 10, 2025)"
+13,2025-04-08,28412.2,5437.8,"The order for 500 sheets of A4 printing paper and 200 sheets of cardstock has been successfully processed and approved. Estimated delivery dates are as follows: 
+- A4 printing paper: April 14, 2025
+- Cardstock: April 14, 2025
+
+The current cash balance is sufficient to cover these expenses."
+12,2025-04-08,28412.2,5437.8,"Successfully ordered 200 sheets of colorful cardstock, 500 sheets of standard printer paper, and 100 paper napkins for delivery by April 15, 2025."
+10,2025-04-08,28412.2,5437.8,"Unable to place the order for 500 sheets of high-quality glossy paper and 300 sheets of sturdy cardstock due to insufficient funds. Current cash balance is -$15,300. To proceed, consider increasing sales revenue or significantly reducing costs."
+11,2025-04-08,28412.2,5437.8,"Successfully placed orders for 500 sheets of A3 glossy paper and 300 sheets of A4 matte paper for the exhibition, both to be delivered by April 15, 2025."
+14,2025-04-09,28412.2,5937.8,"All sales transactions have been successfully processed. \n- 5,000 sheets of A4 paper: Estimated delivery by April 22, 2025.\n- 500 sheets of cardstock: Estimated delivery by April 19, 2025.\n- 2,000 sheets of poster paper: Estimated delivery by April 22, 2025."
+15,2025-04-12,27412.199999999997,5937.8,"All orders have been successfully created and scheduled for delivery by April 15, 2025:
+1. 10,000 sheets of A4 white paper
+2. 5,000 sheets of A3 colored paper (assorted colors)
+3. 500 reams of cardboard for signage (Transaction ID: 613)"
+16,2025-04-13,27412.199999999997,5937.8,"Order placed for 100 sheets of poster board, 200 sheets of colorful construction paper, and 500 sheets of A4 printer paper, all to be delivered by April 15, 2025."
+17,2025-04-14,27412.2,5937.8,"The order for paper supplies has been successfully placed for delivery by April 15, 2025. However, the current cash balance is -$15,300, indicating insufficient funds for the medium order. The financial health is assessed as POOR, with options to cover the deficit including exploring short-term financing, selling excess inventory, reducing operational costs, or seeking additional investments."
+18,2025-04-14,27412.2,5937.8,"Orders have been successfully placed for the following supplies for delivery by April 15, 2025:
+- 500 sheets of high-quality white cardstock
+- 1000 sheets of standard printing paper
+- 200 sheets of colored paper in assorted colors."
+19,2025-04-15,17437.199999999997,6187.799999999999,"The order for 2000 sheets of A4 glossy paper, 1500 sheets of A3 matte paper, and 1000 sheets of cardstock in assorted colors has been placed. The A4 glossy paper and A3 matte paper are estimated to arrive by April 22, 2025, while the cardstock is expected to be delivered by April 19, 2025."
+20,2025-04-17,17437.199999999997,6187.799999999999,"The stock orders for 10,000 tickets, 2,000 posters, and 5,000 flyers have been successfully processed for delivery by May 15, 2025. However, the current cash balance is -$15,300.00, indicating insufficient funds to cover this order."

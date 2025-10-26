@@ -10,12 +10,10 @@ This agent is responsible for:
 
 import pandas as pd
 from smolagents import ToolCallingAgent, tool
-from typing import Dict, List
-from datetime import datetime
+from typing import Dict
 import sys
 from pathlib import Path
 
-# Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import model
@@ -29,10 +27,7 @@ from helpers import (
 
 @tool
 def process_sales_transaction(
-    item_name: str,
-    quantity: int,
-    price: float,
-    date: str
+    item_name: str, quantity: int, price: float, date: str
 ) -> Dict:
     """
     Create a sales transaction in the database.
@@ -53,7 +48,7 @@ def process_sales_transaction(
             transaction_type="sales",
             quantity=quantity,
             price=price,
-            date=date
+            date=date,
         )
 
         return {
@@ -64,22 +59,19 @@ def process_sales_transaction(
             "quantity": quantity,
             "price": price,
             "date": date,
-            "message": f"Sales transaction created successfully for {quantity} units of {item_name}"
+            "message": f"Sales transaction created successfully for {quantity} units of {item_name}",
         }
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
-            "message": f"Failed to create sales transaction: {str(e)}"
+            "message": f"Failed to create sales transaction: {str(e)}",
         }
 
 
 @tool
 def process_stock_order_transaction(
-    item_name: str,
-    quantity: int,
-    price: float,
-    date: str
+    item_name: str, quantity: int, price: float, date: str
 ) -> Dict:
     """
     Create a stock order transaction in the database.
@@ -100,7 +92,7 @@ def process_stock_order_transaction(
             transaction_type="stock_orders",
             quantity=quantity,
             price=price,
-            date=date
+            date=date,
         )
 
         return {
@@ -111,13 +103,13 @@ def process_stock_order_transaction(
             "quantity": quantity,
             "price": price,
             "date": date,
-            "message": f"Stock order created successfully for {quantity} units of {item_name}"
+            "message": f"Stock order created successfully for {quantity} units of {item_name}",
         }
     except Exception as e:
         return {
             "success": False,
             "error": str(e),
-            "message": f"Failed to create stock order: {str(e)}"
+            "message": f"Failed to create stock order: {str(e)}",
         }
 
 
@@ -157,12 +149,12 @@ def check_delivery_timeline(date: str, quantity: int) -> Dict:
             "delivery_date": delivery_date,
             "lead_time_days": lead_time_days,
             "quantity": quantity,
-            "message": f"Estimated delivery by {delivery_date} ({lead_time_days} days lead time)"
+            "message": f"Estimated delivery by {delivery_date} ({lead_time_days} days lead time)",
         }
     except Exception as e:
         return {
             "error": str(e),
-            "message": f"Failed to calculate delivery timeline: {str(e)}"
+            "message": f"Failed to calculate delivery timeline: {str(e)}",
         }
 
 
@@ -187,7 +179,7 @@ def check_restock_needed(item_name: str, date: str) -> Dict:
         inventory_df = pd.read_sql(
             "SELECT min_stock_level, unit_price FROM inventory WHERE item_name = :item_name",
             db_engine,
-            params={"item_name": item_name}
+            params={"item_name": item_name},
         )
 
         if inventory_df.empty:
@@ -196,7 +188,7 @@ def check_restock_needed(item_name: str, date: str) -> Dict:
                 "current_stock": current_stock,
                 "needs_restock": False,
                 "error": "Item not found in inventory catalog",
-                "message": f"Item '{item_name}' not found in inventory catalog"
+                "message": f"Item '{item_name}' not found in inventory catalog",
             }
 
         min_stock = int(inventory_df["min_stock_level"].iloc[0])
@@ -225,13 +217,10 @@ def check_restock_needed(item_name: str, date: str) -> Dict:
                 f"Recommend ordering {reorder_qty} units (${reorder_cost:.2f})"
                 if needs_restock
                 else f"Stock level OK. Current: {current_stock}, Minimum: {min_stock}"
-            )
+            ),
         }
     except Exception as e:
-        return {
-            "error": str(e),
-            "message": f"Failed to check restock status: {str(e)}"
-        }
+        return {"error": str(e), "message": f"Failed to check restock status: {str(e)}"}
 
 
 @tool
@@ -249,7 +238,7 @@ def get_item_unit_price(item_name: str) -> Dict:
         inventory_df = pd.read_sql(
             "SELECT item_name, unit_price, category FROM inventory WHERE item_name = :item_name",
             db_engine,
-            params={"item_name": item_name}
+            params={"item_name": item_name},
         )
 
         if inventory_df.empty:
@@ -257,7 +246,7 @@ def get_item_unit_price(item_name: str) -> Dict:
                 "item_name": item_name,
                 "found": False,
                 "error": "Item not found",
-                "message": f"Item '{item_name}' not found in inventory"
+                "message": f"Item '{item_name}' not found in inventory",
             }
 
         return {
@@ -265,13 +254,10 @@ def get_item_unit_price(item_name: str) -> Dict:
             "unit_price": float(inventory_df["unit_price"].iloc[0]),
             "category": inventory_df["category"].iloc[0],
             "found": True,
-            "message": f"Unit price for '{item_name}': ${inventory_df['unit_price'].iloc[0]}"
+            "message": f"Unit price for '{item_name}': ${inventory_df['unit_price'].iloc[0]}",
         }
     except Exception as e:
-        return {
-            "error": str(e),
-            "message": f"Failed to get item price: {str(e)}"
-        }
+        return {"error": str(e), "message": f"Failed to get item price: {str(e)}"}
 
 
 # Create the OrderingAgent
@@ -284,7 +270,7 @@ ordering_agent = ToolCallingAgent(
         get_item_unit_price,
     ],
     model=model,
-    max_steps=5,
+    max_steps=8,
     name="OrderingAgent",
     description="""You are the Ordering Agent for Munder Difflin paper company.
 
@@ -296,6 +282,8 @@ Your responsibilities:
 5. Calculate costs for stock orders
 
 IMPORTANT RULES:
+- **CRITICAL**: Only process transactions for items that exist in the inventory catalog
+- If get_item_unit_price returns "found": False, IMMEDIATELY return an error - DO NOT create transactions
 - Always use exact item names from the inventory
 - For sales transactions: Use transaction_type="sales" and record the selling price
 - For stock orders: Use transaction_type="stock_orders" and record the cost
@@ -304,6 +292,7 @@ IMPORTANT RULES:
 - Calculate delivery timelines based on order quantity
 - Always include dates in ISO format (YYYY-MM-DD)
 - Verify item prices from inventory before creating transactions
+- If an item is not found, explain to the orchestrator that the item doesn't exist in inventory
 
 Workflow for processing a customer order:
 1. Check current stock levels for requested items
@@ -320,5 +309,5 @@ Workflow for restocking:
 5. Calculate delivery timeline
 
 Always provide clear status messages about transaction success or failure.
-"""
+""",
 )

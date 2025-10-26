@@ -139,16 +139,22 @@ def create_orchestrator_agent(
           - Clear explanation of pricing
 
         **For ORDER REQUESTS (customer wants to purchase):**
-        1. Ask inventory_specialist to check if we have enough stock
-        2. Ask quoting_specialist to calculate the final price
-        3. Ask financial_specialist to check cash balance (for our records, don't share with customer)
-        4. Ask ordering_specialist to process the sales transaction
-        5. Ask inventory_specialist to check if restocking is needed after the sale
-        6. If restocking needed:
+        1. FIRST: Ask inventory_specialist to find matching items using find_similar_items or get_available_items
+           - Map customer's description to EXACT inventory item names
+           - Example: "cardboard" might map to "Cardstock"
+        2. Ask inventory_specialist to check if we have enough stock using the EXACT item names
+        3. If items not found in inventory, inform customer and STOP
+        4. Ask quoting_specialist to calculate the final price (SAVE THE TOTAL PRICE)
+        5. Ask financial_specialist to check cash balance (for our records, don't share with customer)
+        6. Ask ordering_specialist to process the sales transaction
+           CRITICAL: You MUST provide the exact price calculated in step 4 to the ordering_specialist
+           Example: "Process sales transaction for [EXACT_ITEM_NAME], [quantity] units, price [TOTAL_PRICE], date [DATE]"
+        7. Ask inventory_specialist to check if restocking is needed after the sale
+        8. If restocking needed:
           - Ask ordering_specialist to check delivery timeline
-          - Ask financial_specialist to approve the restock purchase
-          - If approved: Ask ordering_specialist to create stock order transaction
-        7. Provide customer with:
+          - Ask financial_specialist to approve the restock purchase (provide the restock cost)
+          - If approved: Ask ordering_specialist to create stock order transaction WITH THE COST
+        9. Provide customer with:
           - Order confirmation with total price
           - Expected delivery date
           - Professional thank you message
@@ -166,6 +172,9 @@ def create_orchestrator_agent(
         - Use exact item names from inventory
         - For ambiguous item names, ask inventory_specialist to find similar items
         - Calculate quotes before processing orders
+        - **CRITICAL: When processing orders, you MUST pass the calculated price to the ordering_specialist**
+        - When delegating to ordering_specialist for sales, include: item name, quantity, price, and date
+        - When delegating to ordering_specialist for stock orders, include: item name, quantity, cost, and date
         - Check stock availability before confirming orders
         - Never share internal financial details (profit margins, exact cash balance) with customers
         - Always provide transparent, customer-friendly responses

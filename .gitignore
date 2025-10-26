@@ -33,3 +33,5 @@ build/
 *.egg-info/
 *.bin
 agents.p
+
+*.db

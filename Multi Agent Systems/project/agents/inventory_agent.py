@@ -1,28 +1,23 @@
 """
-InventoryAgent for Munder Difflin Paper Company.
+InventoryAgent
 
 This agent is responsible for:
-- Checking stock levels for specific items
-- Searching for items in the inventory catalog
-- Finding items by category or keyword
-- Getting item prices
-- Mapping customer requests to actual inventory item names
+  - Checking stock levels for specific items
+  - Searching for items in the inventory catalog
+  - Finding items by category or keyword
+  - Getting item prices
+  - Mapping customer requests to actual inventory item names
 """
 
 import pandas as pd
 from smolagents import ToolCallingAgent, tool
-from typing import List, Dict
 import sys
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent))
 
 from config import model
-from helpers import (
-    get_stock_level,
-    get_all_inventory,
-    db_engine,
-)
+from helpers import (get_stock_level, get_all_inventory, db_engine)
 
 
 @tool
@@ -42,8 +37,9 @@ def check_item_stock(item_name: str, date: str) -> dict:
         return {"item_name": item_name, "current_stock": 0}
     return {
         "item_name": result["item_name"].iloc[0],
-        "current_stock": int(result["current_stock"].iloc[0])
+        "current_stock": int(result["current_stock"].iloc[0]),
     }
+
 
 @tool
 def check_all_inventory(date: str) -> dict:
@@ -58,6 +54,7 @@ def check_all_inventory(date: str) -> dict:
     """
     return get_all_inventory(date)
 
+
 @tool
 def get_available_items() -> list:
     """
@@ -66,8 +63,11 @@ def get_available_items() -> list:
     Returns:
       list: List of dicts containing item_name, category, and unit_price
     """
-    inventory_df = pd.read_sql("SELECT item_name, category, unit_price FROM inventory", db_engine)
+    inventory_df = pd.read_sql(
+        "SELECT item_name, category, unit_price FROM inventory", db_engine
+    )
     return inventory_df.to_dict(orient="records")
+
 
 @tool
 def find_similar_items(search_term: str) -> list:
@@ -83,9 +83,12 @@ def find_similar_items(search_term: str) -> list:
     """
     inventory_df = pd.read_sql("SELECT * FROM inventory", db_engine)
     matches = inventory_df[
-        inventory_df["item_name"].str.lower().str.contains(search_term.lower(), na=False)
+        inventory_df["item_name"]
+        .str.lower()
+        .str.contains(search_term.lower(), na=False)
     ]
     return matches.to_dict(orient="records")
+
 
 @tool
 def get_item_price(item_name: str) -> float:
@@ -101,11 +104,12 @@ def get_item_price(item_name: str) -> float:
     inventory_df = pd.read_sql(
         "SELECT item_name, unit_price FROM inventory WHERE item_name = :item_name",
         db_engine,
-        params={"item_name": item_name}
+        params={"item_name": item_name},
     )
     if inventory_df.empty:
         return -1.0
     return float(inventory_df["unit_price"].iloc[0])
+
 
 @tool
 def find_items_by_category(category: str) -> list:
@@ -121,9 +125,10 @@ def find_items_by_category(category: str) -> list:
     inventory_df = pd.read_sql(
         "SELECT * FROM inventory WHERE category = :category",
         db_engine,
-        params={"category": category}
+        params={"category": category},
     )
     return inventory_df.to_dict(orient="records")
+
 
 inventory_agent = ToolCallingAgent(
     tools=[
@@ -132,32 +137,32 @@ inventory_agent = ToolCallingAgent(
         get_available_items,
         find_similar_items,
         get_item_price,
-        find_items_by_category
+        find_items_by_category,
     ],
     model=model,
     max_steps=5,
     name="InventoryAgent",
     description="""You are the Inventory Agent for Munder Difflin paper company.
     Your responsibilities:
-    1. Check stock levels for specific items on specific dates
-    2. Search for items in inventory catalog by keywords or category
-    3. Map customer requests to actual inventory item names
-    4. Report current inventory status and prices
-    5. Identify if items are in stock or out of stock
+      1. Check stock levels for specific items on specific dates
+      2. Search for items in inventory catalog by keywords or category
+      3. Map customer requests to actual inventory item names
+      4. Report current inventory status and prices
+      5. Identify if items are in stock or out of stock
 
     IMPORTANT RULES:
-    - Always include the DATE in your stock checks
-    - Use exact item names from the inventory when reporting
-    - When customer requests don't match exact item names, use find_similar_items to search
-    - Use find_items_by_category when asked about categories: 'paper', 'product', 'large_format', 'specialty'
-    - Report stock levels as integers
-    - If an item is not in the catalog, clearly state that
+      - Always include the DATE in your stock checks
+      - Use exact item names from the inventory when reporting
+      - When customer requests don't match exact item names, use find_similar_items to search
+      - Use find_items_by_category when asked about categories: 'paper', 'product', 'large_format', 'specialty'
+      - Report stock levels as integers
+      - If an item is not in the catalog, clearly state that
 
     Example interactions:
-    - "Check if we have Glossy paper in stock on 2025-04-01" -> Use check_item_stock
-    - "What items do we have related to 'cardstock'?" -> Use find_similar_items
-    - "Show me all inventory on 2025-04-01" -> Use check_all_inventory
-    - "What paper items do we have?" -> Use find_items_by_category with category='paper'
-    - "What's the price of A4 paper?" -> Use get_item_price
-"""
+      - "Check if we have Glossy paper in stock on 2025-04-01" -> Use check_item_stock
+      - "What items do we have related to 'cardstock'?" -> Use find_similar_items
+      - "Show me all inventory on 2025-04-01" -> Use check_all_inventory
+      - "What paper items do we have?" -> Use find_items_by_category with category='paper'
+      - "What's the price of A4 paper?" -> Use get_item_price
+""",
 )

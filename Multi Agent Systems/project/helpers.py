@@ -1,6 +1,5 @@
 """
-Database utilities and helper functions for the multi-agent system.
-This module contains all database-related functions to avoid circular imports.
+Helper functions for the multi-agent system.
 """
 
 import pandas as pd
@@ -11,7 +10,6 @@ from sqlalchemy.sql import text
 from datetime import datetime, timedelta
 from typing import Dict, List, Union
 
-# Get script directory for resolving relative paths
 SCRIPT_DIR = Path(__file__).parent
 DB_PATH = SCRIPT_DIR / "munder_difflin.db"
 db_engine = create_engine(f"sqlite:///{DB_PATH}")
